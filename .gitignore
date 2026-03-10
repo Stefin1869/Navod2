@@ -9,6 +9,9 @@ source/*.pdf
 source/*.xml
 source/*.zip
 
+# Redaktorská příručka (interní dokument)
+redaktorská pravidla/
+
 # LanguageTool JAR (stáhnout ručně)
 tools/languagetool/
 

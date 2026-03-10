@@ -1,0 +1,23 @@
+# Build výstupy
+bin/
+obj/
+*.user
+.vs/
+
+# Velké zdrojové soubory (návody)
+source/*.pdf
+source/*.xml
+source/*.zip
+
+# LanguageTool JAR (stáhnout ručně)
+tools/languagetool/
+
+# Data (generována za běhu, zachovat příklad)
+# data/forbidden-words.json  <- tento soubor chceme verzovat
+
+# Uživatelská nastavení aplikace
+*.settings.json
+appsettings.local.json
+
+# Claude Code paměť
+.claude/

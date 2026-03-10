@@ -1,0 +1,82 @@
+<UserControl x:Class="Navod2.App.Views.ForbiddenWordListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Navod2.App">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="320"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Seznam slov -->
+        <Grid Grid.Column="0" Margin="0,0,8,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                <Button Command="{Binding NewWordCommand}" Padding="10,5">Přidat slovo</Button>
+                <Button Command="{Binding EditSelectedCommand}" Padding="10,5" Margin="8,0,0,0">Upravit</Button>
+                <Button Command="{Binding DeleteSelectedCommand}" Padding="10,5" Margin="8,0,0,0">Smazat</Button>
+            </StackPanel>
+
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding Words}"
+                      SelectedItem="{Binding SelectedWord}"
+                      AutoGenerateColumns="False" IsReadOnly="True"
+                      SelectionMode="Single" GridLinesVisibility="Horizontal"
+                      AlternatingRowBackground="#F7F7F7" CanUserResizeRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Zakázané slovo" Binding="{Binding Word}" Width="160"/>
+                    <DataGridTextColumn Header="Správná alternativa" Binding="{Binding Suggestion}" Width="180"/>
+                    <DataGridTextColumn Header="Kategorie" Binding="{Binding Category}" Width="120"/>
+                    <DataGridTextColumn Header="Poznámka" Binding="{Binding Reason}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <TextBlock Grid.Row="2" Text="{Binding StatusText}" Margin="0,4,0,0" Foreground="DimGray"/>
+        </Grid>
+
+        <!-- Panel pro editaci -->
+        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1"
+                Padding="12" CornerRadius="4"
+                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="Zakázané slovo" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding EditWord, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,12"/>
+
+                <TextBlock Text="Správná alternativa" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding EditSuggestion, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,12"/>
+
+                <TextBlock Text="Kategorie" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <ComboBox Text="{Binding EditCategory}" IsEditable="True" Margin="0,0,0,12">
+                    <ComboBoxItem>terminologie</ComboBoxItem>
+                    <ComboBoxItem>styl</ComboBoxItem>
+                    <ComboBoxItem>zastaralé</ComboBoxItem>
+                    <ComboBoxItem>legislativa</ComboBoxItem>
+                </ComboBox>
+
+                <TextBlock Text="Poznámka (výjimky, důvod)" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding EditReason, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,12" AcceptsReturn="True" Height="60" TextWrapping="Wrap"/>
+
+                <CheckBox Content="Rozlišovat velká/malá písmena"
+                          IsChecked="{Binding EditCaseSensitive}"
+                          Margin="0,0,0,16"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding SaveEditCommand}" Padding="12,6" MinWidth="80">Uložit</Button>
+                    <Button Command="{Binding CancelEditCommand}" Padding="12,6" MinWidth="80" Margin="8,0,0,0">Zrušit</Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</UserControl>

@@ -1,0 +1,94 @@
+<Window x:Class="Navod2.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:Navod2.App.Views"
+        Title="Navod2 – Editor palubní literatury Škoda"
+        Height="700" Width="1100"
+        MinHeight="500" MinWidth="800"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <Style TargetType="Button" x:Key="PrimaryButton">
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="AlternatingRowBackground" Value="#F7F7F7"/>
+            <Setter Property="CanUserResizeRows" Value="False"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <ToolBar Grid.Row="0" Padding="4">
+            <Button Command="{Binding LoadDocumentCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    ToolTip="Načíst XML, ZIP nebo PDF dokument (Ctrl+O)">
+                Načíst dokument…
+            </Button>
+            <Separator/>
+            <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
+                       Text="{Binding DocumentTitle}" Margin="8,0"/>
+            <TextBlock VerticalAlignment="Center" Foreground="Gray" Margin="4,0"
+                       Text="(nebo přetáhněte soubor sem)"/>
+        </ToolBar>
+
+        <!-- Progress bar (viditelný jen při načítání) -->
+        <ProgressBar Grid.Row="1" Height="4"
+                     Value="{Binding LoadProgress}"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}"/>
+
+        <!-- Hlavní obsah – záložky -->
+        <TabControl Grid.Row="2"
+                    SelectedIndex="{Binding SelectedTabIndex}"
+                    Margin="4">
+
+            <TabItem Header="Zakázaná slova – Kontrola">
+                <views:ForbiddenWordCheckView DataContext="{Binding ForbiddenWordCheck}"/>
+            </TabItem>
+
+            <TabItem Header="Zakázaná slova – Seznam">
+                <views:ForbiddenWordListView DataContext="{Binding ForbiddenWordList}"/>
+            </TabItem>
+
+            <TabItem Header="Gramatika">
+                <views:GrammarCheckView DataContext="{Binding GrammarCheck}"/>
+            </TabItem>
+
+            <TabItem Header="Formát čísel">
+                <views:NumberFormatView DataContext="{Binding NumberFormat}"/>
+            </TabItem>
+
+            <TabItem Header="Porovnání verzí">
+                <views:DiffView DataContext="{Binding Diff}"/>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- Stavový řádek -->
+        <StatusBar Grid.Row="3">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusMessage}"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding LoadDocumentCommand}"/>
+    </Window.InputBindings>
+</Window>

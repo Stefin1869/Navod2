@@ -1,0 +1,114 @@
+<UserControl x:Class="Navod2.App.Views.DiffView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Výběr souborů -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0" Header="Dokument A (starší verze)" Margin="0,0,4,0" Padding="8">
+                <StackPanel>
+                    <TextBox Text="{Binding PathA}" IsReadOnly="True" Margin="0,0,0,6"
+                             Background="#F5F5F5" Padding="4"/>
+                    <Button Command="{Binding LoadDocumentACommand}" Padding="10,5">
+                        Načíst dokument A…
+                    </Button>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Header="Dokument B (novější verze)" Margin="4,0,0,0" Padding="8">
+                <StackPanel>
+                    <TextBox Text="{Binding PathB}" IsReadOnly="True" Margin="0,0,0,6"
+                             Background="#F5F5F5" Padding="4"/>
+                    <Button Command="{Binding LoadDocumentBCommand}" Padding="10,5">
+                        Načíst dokument B…
+                    </Button>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+
+        <!-- Toolbar a statistika -->
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Command="{Binding RunDiffCommand}" Padding="12,6" MinWidth="140">
+                    Porovnat dokumenty
+                </Button>
+                <ProgressBar Width="80" Height="8" Margin="12,0" IsIndeterminate="True"
+                             Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+
+            <!-- Statistika -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Border Background="#C8E6C9" CornerRadius="3" Padding="8,4" Margin="4,0">
+                    <TextBlock>
+                        <Run Text="+ Přidáno: "/>
+                        <Run Text="{Binding CountAdded}" FontWeight="Bold"/>
+                    </TextBlock>
+                </Border>
+                <Border Background="#FFCDD2" CornerRadius="3" Padding="8,4" Margin="4,0">
+                    <TextBlock>
+                        <Run Text="- Smazáno: "/>
+                        <Run Text="{Binding CountDeleted}" FontWeight="Bold"/>
+                    </TextBlock>
+                </Border>
+                <Border Background="#FFF9C4" CornerRadius="3" Padding="8,4" Margin="4,0">
+                    <TextBlock>
+                        <Run Text="~ Změněno: "/>
+                        <Run Text="{Binding CountModified}" FontWeight="Bold"/>
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Seznam změn -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding NodeDiffs}"
+                  SelectedItem="{Binding SelectedDiff}"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Single" GridLinesVisibility="Horizontal"
+                  CanUserResizeRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Změna" Binding="{Binding ChangeType}" Width="80"/>
+                <DataGridTextColumn Header="Kapitola" Binding="{Binding Title}" Width="*"/>
+                <DataGridTextColumn Header="ID" Binding="{Binding NodeId}" Width="200"/>
+            </DataGrid.Columns>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ChangeType}" Value="Added">
+                            <Setter Property="Background" Value="#E8F5E9"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ChangeType}" Value="Deleted">
+                            <Setter Property="Background" Value="#FFEBEE"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ChangeType}" Value="Modified">
+                            <Setter Property="Background" Value="#FFFDE7"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
+
+        <!-- Stavový řádek -->
+        <TextBlock Grid.Row="3" Text="{Binding StatusText}" Margin="0,6,0,0" Foreground="DimGray"/>
+    </Grid>
+
+</UserControl>

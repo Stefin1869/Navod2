@@ -1,0 +1,82 @@
+<UserControl x:Class="Navod2.App.Views.GrammarCheckView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Navod2.App">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <local:NullToVisibilityConverter x:Key="NullToVis"/>
+        <local:BoolToColorConverter x:Key="BoolToColor"/>
+    </UserControl.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- LanguageTool nastavení -->
+        <GroupBox Grid.Row="0" Header="LanguageTool" Margin="0,0,0,8" Padding="8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="URL:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Text="{Binding LanguageToolUrl, UpdateSourceTrigger=PropertyChanged}"
+                         Width="220" VerticalAlignment="Center"/>
+                <Button Command="{Binding CheckLanguageToolCommand}" Padding="10,4" Margin="8,0">
+                    Ověřit spojení
+                </Button>
+                <Ellipse Width="12" Height="12" Margin="4,0"
+                         Fill="{Binding LanguageToolAvailable, Converter={StaticResource BoolToColor}}"/>
+                <TextBlock VerticalAlignment="Center" Margin="4,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="Nedostupný"/>
+                            <Setter Property="Foreground" Value="Red"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LanguageToolAvailable}" Value="True">
+                                    <Setter Property="Text" Value="Dostupný"/>
+                                    <Setter Property="Foreground" Value="Green"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Command="{Binding RunCheckCommand}" Padding="12,6" MinWidth="140">
+                Spustit kontrolu gramatiky
+            </Button>
+            <Button Command="{Binding ExportCsvCommand}" Padding="12,6" MinWidth="100" Margin="8,0,0,0">
+                Exportovat CSV
+            </Button>
+            <Separator Margin="8,0"/>
+            <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="DimGray"/>
+            <ProgressBar Width="120" Height="8" Margin="8,0" IsIndeterminate="True"
+                         Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
+        </StackPanel>
+
+        <!-- Výsledky -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Results}"
+                  SelectedItem="{Binding SelectedResult}"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Single" GridLinesVisibility="Horizontal"
+                  AlternatingRowBackground="#F7F7F7" CanUserResizeRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Chyba" Binding="{Binding Message}" Width="280"/>
+                <DataGridTextColumn Header="Návrh opravy" Binding="{Binding Suggestion}" Width="160"/>
+                <DataGridTextColumn Header="Kapitola" Binding="{Binding NodePath}" Width="200"/>
+                <DataGridTextColumn Header="Kontext" Binding="{Binding Context}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Detail -->
+        <Border Grid.Row="3" BorderBrush="LightGray" BorderThickness="0,1,0,0" Margin="0,8,0,0" Padding="0,8,0,0"
+                Visibility="{Binding SelectedResult, Converter={StaticResource NullToVis}}">
+            <TextBlock Text="{Binding SelectedResult.Context}" TextWrapping="Wrap"/>
+        </Border>
+    </Grid>
+
+</UserControl>

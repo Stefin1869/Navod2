@@ -1,0 +1,69 @@
+<UserControl x:Class="Navod2.App.Views.ForbiddenWordCheckView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Navod2.App">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <local:InverseBoolConverter x:Key="InverseBool"/>
+        <local:NullToVisibilityConverter x:Key="NullToVis"/>
+    </UserControl.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Command="{Binding RunCheckCommand}" Padding="12,6" MinWidth="120"
+                    IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBool}}">
+                Spustit kontrolu
+            </Button>
+            <Button Command="{Binding ExportCsvCommand}" Padding="12,6" MinWidth="100" Margin="8,0,0,0">
+                Exportovat CSV
+            </Button>
+            <Separator Margin="8,0"/>
+            <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="DimGray"/>
+            <ProgressBar Width="120" Height="8" Margin="8,0" IsIndeterminate="True"
+                         Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
+        </StackPanel>
+
+        <!-- Výsledky -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Results}"
+                  SelectedItem="{Binding SelectedResult}"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Single" GridLinesVisibility="Horizontal"
+                  AlternatingRowBackground="#F7F7F7" CanUserResizeRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Zakázané slovo" Binding="{Binding MatchedText}" Width="160"/>
+                <DataGridTextColumn Header="Návrh" Binding="{Binding Suggestion}" Width="180"/>
+                <DataGridTextColumn Header="Kapitola" Binding="{Binding NodePath}" Width="200"/>
+                <DataGridTextColumn Header="Kontext" Binding="{Binding Context}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Detail vybraného výsledku -->
+        <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,1,0,0" Margin="0,8,0,0" Padding="0,8,0,0"
+                Visibility="{Binding SelectedResult, Converter={StaticResource NullToVis}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Nalezeno: " FontWeight="SemiBold" Margin="0,2"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedResult.MatchedText}" Margin="0,2"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Návrh: " FontWeight="SemiBold" Margin="0,2"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedResult.Suggestion}" Margin="0,2" Foreground="Green"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Kontext: " FontWeight="SemiBold" Margin="0,2"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedResult.Context}" Margin="0,2" TextWrapping="Wrap"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
